@@ -1,0 +1,300 @@
+/* =========================
+   Container & Layout
+========================= */
+.container {
+  padding: 1.3rem;
+  background-color: #fffdfd;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+/* =========================
+   Backdrop & Profile Image
+========================= */
+.backDropContainer {
+  width: 100%;
+  height: 30vh;
+  background: url("https://images.pexels.com/photos/545521/pexels-photo-545521.jpeg")
+    center/cover no-repeat;
+  position: relative;
+  border-radius: 20px;
+}
+
+.backDrop img {
+  width: 10em;
+  height: 10em;
+  object-fit: cover;
+  border-radius: 50%;
+  position: absolute;
+  bottom: -30%;
+  left: 8%;
+  transition: transform 0.3s ease;
+  text-align: center;
+}
+.backDrop_overlay {
+  width: 10em;
+  height: 10em;
+  object-fit: cover;
+  border-radius: 50%;
+  position: absolute;
+  bottom: -30%;
+  left: 8%;
+  transition: transform 0.3s ease;
+  text-align: center;
+
+  z-index: 4;
+  transition: all 0.4s ease;
+  color: white;
+  opacity: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.backDrop_overlay:hover {
+  background: black;
+  cursor: pointer;
+  opacity: 0.8;
+}
+
+/* =========================
+   Profile Details
+========================= */
+.profileContainer {
+  display: flex;
+  flex-direction: column;
+}
+
+.profileContainer_Details {
+  padding-top: 4rem;
+}
+
+.profileContainer_Details h2 {
+  margin: 0;
+  font-size: 1.5rem;
+}
+
+.profileContainer_Details p {
+  color: gray;
+  margin: 0.2rem 0;
+}
+
+.profileContainer_Details div.bio {
+  margin-top: 0.5rem;
+}
+
+/* Flex layout for profile + recent activity */
+.profileContainer_Details > div.flex-wrapper {
+  display: flex;
+  gap: 0.7rem;
+}
+
+.profileContainer_Details .left {
+  flex: 0.8;
+}
+
+.profileContainer_Details .right {
+  flex: 0.2;
+}
+
+/* =========================
+   Connection Button
+========================= */
+.connectedButton {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background-color: #0a66c2;
+  color: #fff;
+  font-weight: 600;
+  border: none;
+  border-radius: 20px;
+  padding: 0.4rem 1rem;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background 0.2s ease-in-out;
+}
+
+.connectedButton:hover {
+  background-color: #004182;
+}
+
+.connectedButton svg {
+  width: 1.3em;
+  height: 1.3em;
+  fill: white;
+}
+
+/* =========================
+   Recent Activity / Posts
+========================= */
+.recentActivity {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  max-height: 450px;
+  overflow-y: auto;
+  padding-right: 0.5rem;
+}
+
+.postCard {
+  display: flex;
+  justify-content: flex-start;
+  width: 100%;
+}
+
+.card {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  width: 100%;
+  padding: 0.8rem;
+  background: #ffffff;
+  border-radius: 14px;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.08);
+  transition: all 0.2s ease-in-out;
+  cursor: pointer;
+}
+
+.card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.12);
+}
+
+.card_profileContainer {
+  flex-shrink: 0;
+  width: 60px;
+  height: 60px;
+  border-radius: 12px;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f1f1f1;
+}
+
+.card_profileContainer img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.card p {
+  flex: 1;
+  font-size: 14px;
+  color: #333;
+  margin: 0;
+  line-height: 1.4;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  /* -webkit-line-clamp: 2; Clamp to 2 lines */
+}
+
+/* =========================
+   Work History
+========================= */
+.workHistory {
+  margin-top: 2rem;
+}
+
+.WorkHistoryContainer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.workHistoryCard {
+  padding: 0.8rem;
+  background-color: #fdfdfd;
+  border-radius: 12px;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.08);
+}
+
+.workHistoryCard h5 {
+  margin: 0;
+  font-size: 1rem;
+}
+
+.workHistoryCard p {
+  margin: 0.2rem 0 0 0;
+  font-size: 0.9rem;
+  color: gray;
+}
+
+.nameEdit{
+  width: 100%;
+  font-size: 1.5rem;
+  font-weight: bold;
+  border: none;
+  border-bottom: 2px solid transparent;
+  outline: none;
+  transition: border-color 0.3s ease;
+}
+.updateProfileBtn{
+    padding-inline: 0.8rem;
+    padding-block: 0.3rem;
+    background: rgba(3,93,183,0.905);
+    outline: none;
+    border: none;
+    border-radius: 10px;
+    color: white;
+    cursor: pointer;
+    width: fit-content;
+}
+.textareaBio{
+  width: 80%;
+  font-size:large;
+  border: none;
+  border-bottom: 2px solid transparent;
+  outline: none;
+  transition: border-color 0.3s ease;
+}
+.addWorkBtn{
+  padding-inline: 1.3rem;
+  background: white;
+  border: 1px dotted silver;
+  border-radius: 10px;
+  padding-block:1.4rem;
+  width: fit-content;
+}
+
+
+.commentsContainer{
+  position: fixed;
+  width: 100vw;
+  height: 100vh;
+  top: 0;
+  left: 0;
+  z-index: 5;
+  background-color: rgba(0, 0, 0, 0.7);
+  overflow: hidden;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+}
+
+.allCommentsContainer{
+  width: 40vw;
+  height: fit-content;
+  background-color: white;
+  border-radius: 10px;
+  padding: 1.4rem;
+  position: relative;
+  top: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+  
+}
+.inputField {
+  width: 100%;
+  padding: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 12px;
+  background: transparent;
+  font-size: 1rem;
+  transition: 0.25s ease;
+}

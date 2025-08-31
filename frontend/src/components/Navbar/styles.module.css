@@ -1,0 +1,85 @@
+/* src/components/Navbar/styles.module.css */
+
+.container {
+  width: 100%;
+  background-color: #ffffff;
+  border-bottom: 1px solid #eaeaea;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05); /* subtle shadow */
+}
+
+.navBar {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 1rem 2rem;
+
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.navBar h1 {
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: #0070f3;
+  margin: 0;
+  cursor: pointer;
+  transition: color 0.25s ease, transform 0.2s ease;
+}
+
+.navBar h1:hover {
+  color: #0051a8;
+  transform: scale(1.05); /* subtle hover effect */
+}
+
+.navBarOptionCOntainer {
+  display: flex;
+  align-items: center;
+  gap: 2rem; /* more breathing space */
+  font-size: 1rem;
+}
+
+.navBarOptionCOntainer p,
+.navBarOptionCOntainer div {
+  margin: 0;
+  cursor: pointer;
+  font-weight: 500;
+  color: #333;
+  transition: color 0.25s ease, transform 0.2s ease;
+}
+
+.navBarOptionCOntainer p:hover,
+.navBarOptionCOntainer div:hover {
+  color: #0070f3;
+  transform: translateY(-2px); /* smooth lift effect */
+}
+
+/* Profile/logout section styling */
+.navBarOptionCOntainer div > p {
+  display: inline-block;
+  padding: 0.3rem 0.6rem;
+  border-radius: 6px;
+  transition: background-color 0.25s ease;
+}
+
+.navBarOptionCOntainer div > p:hover {
+  background-color: #f3f6ff; /* light hover bg */
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+  .navBar {
+    padding: 0.8rem 1.2rem;
+  }
+
+  .navBarOptionCOntainer {
+    gap: 1rem;
+    font-size: 0.95rem;
+  }
+
+  .navBar h1 {
+    font-size: 1.3rem;
+  }
+}
