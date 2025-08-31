@@ -117,12 +117,12 @@ function ViewProfilePage({ userProfile }) {
                     }}
                   >
                     {isCurrentUserInConnection ? (
-                      <button className={styles.connectedButton}>
+                      <button className={styles.connectBtn}>
                         {isConnectionNull ? "pending" : "Connected"}
                       </button>
                     ) : (
                       <button
-                        className={styles.connectedBtn}
+                        className={styles.connectedButton}
                         onClick={() => {
                           dispatch(
                             sendConnectionRequest({
