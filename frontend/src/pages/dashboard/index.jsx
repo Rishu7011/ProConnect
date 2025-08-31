@@ -1,6 +1,7 @@
-import { Base_URL } from "../../config/index.jsx";
+import { Base_URL } from "../../config";
 import styles from "./styles.module.css";
-import { getAboutUser, getAllUsers } from "../../config/redux/action/authAction/index.js";
+
+import { getAboutUser, getAllUsers } from "../../config/redux/action/authAction";
 import {
   getAllPosts,
   createPost,
@@ -8,17 +9,20 @@ import {
   incrementPostLike,
   getAllComments,
   postComment,
-} from "../../config/redux/action/postAction/index.js";
+} from "../../config/redux/action/postAction";
 import {
   setTokenIsNotThere,
   setTokenIsThere,
-} from "../../config/redux/reducer/authReducer/index.js";
-import DashboardLayout from "../../layout/DashboardLayout/index.jsx";
-import UserLayout from "../../layout/UserLayout/index.jsx";
+} from "../../config/redux/reducer/authReducer";
+import { resetPostId } from "../../config/redux/reducer/postReducer";
+
+import DashboardLayout from "../../layout/DashboardLayout";
+import UserLayout from "../../layout/UserLayout";
+
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { resetPostId } from "../../config/redux/reducer/postReducer/index.js";
+
 function Dashboard() {
   const router = useRouter();
   const dispatch = useDispatch();
