@@ -1,4 +1,4 @@
-import { store } from "../config/redux/store.js";
+import { store } from "../config/redux/store";
 // import UserLayout from "@/layout/UserLayout";
 import "@/styles/globals.css";
 import { Provider } from "react-redux";
