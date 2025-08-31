@@ -48,7 +48,7 @@
 import { useDispatch, useSelector } from "react-redux";
 import styles from "./styles.module.css";
 import { useRouter } from "next/router";
-import { reset } from "@/config/redux/reducer/authReducer";
+import { reset } from "../../config/redux/reducer/authReducer/index.js";
 
 function NavBarComponent() {
   const router = useRouter();

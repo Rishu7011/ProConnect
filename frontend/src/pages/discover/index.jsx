@@ -1,6 +1,6 @@
-import { getAboutUser, getAllUsers } from "@/config/redux/action/authAction";
-import DashboardLayout from "@/layout/DashboardLayout/index.jsx";
-import UserLayout from "@/layout/UserLayout/index.jsx";
+import { getAboutUser, getAllUsers } from "../../config/redux/action/authAction";
+import DashboardLayout from "../../layout/DashboardLayout/index.jsx";
+import UserLayout from "../../layout/UserLayout/index.jsx";
 import styles from "./styles.module.css";
 
 import React, { useEffect } from "react";

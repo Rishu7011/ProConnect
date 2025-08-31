@@ -1,6 +1,6 @@
 import styles from "./styles.module.css";
 import { useEffect } from "react";
-import { setTokenIsThere } from "@/config/redux/reducer/authReducer";
+import { setTokenIsThere } from "../../config/redux/reducer/authReducer";
 import { useDispatch, useSelector } from "react-redux";
 import { useRouter } from "next/router";
 
