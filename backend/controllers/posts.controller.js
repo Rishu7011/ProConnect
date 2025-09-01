@@ -6,7 +6,17 @@ import User from "../models/user.model.js"; // User model
 import Post from "../models/post.model.js"; // Post model
 import bcrypt from "bcrypt"; // For password hashing (not used here)
 import Comment from "../models/comments.model.js";
+import { v2 as cloudinary } from "cloudinary";
+import fs from "fs"; // to remove local file after upload
 
+// configure with your credentials
+cloudinary.config({
+  cloud_name: process.env.cloud_name,
+  api_key: process.env.api_key,
+  api_secret: process.env.api_secret
+});
+import axios from "axios";
+import { response } from "express";
 // ============================================================
 // CHECK SERVER STATUS
 // ============================================================
@@ -18,30 +28,48 @@ export const activeCheck = async (req, res) => {
 // CREATE A POST
 // ============================================================
 export const createPost = async (req, res) => {
-  const { token } = req.body;
+  console.log("check:-1")
+ try{
+  console.log("check0")
+  console.log("check0")
+  console.log("check0")
+  console.log("check0")
+  console.log("check0")
+  console.log("check0")
+  console.log("check0")
 
-  try {
-    // Verify user using token
-    const user = await User.findOne({ token: token });
-    if (!user) {
-      return res.status(404).json({ message: "User not found" });
+    const formData = await res.formData()
+    console.log(formData)
+    const file = formData.get('postFile')
+    console.log("formData:", formData)
+    if (!file) {
+      return response.json({ error: 'File not found' }, { status: 400 })
     }
 
-    // Create a new post object
-    const post = new Post({
-      userId: user._id,
-      body: req.body.body, // Post content (text)
-      media: req.file != undefined ? req.file.filename : "", // Uploaded file name if exists
-      filetypes: req.file != undefined ? req.file.mimetype.split("/")[1] : "", // File type (e.g. jpg, png, mp4)
-    });
+    const bytes = await file.arrayBuffer()
+    const buffer = Buffer.from(bytes)
 
-    // Save post in DB
-    await post.save();
-    return res.status(200).json({ message: "post created" });
-  } catch (error) {
-    return res.status(500).json({ message: error.message });
+    const result = await new Promise<CloudinaryUploadResult>((resolve, reject) => {
+      const uploadStream = cloudinary.uploader.upload_stream(
+        { folder: 'next-cloudinary-uploads' },
+        (error, result) => {
+          if (error) reject(error)
+          else resolve(result)
+        }
+      )
+      uploadStream.end(buffer)
+    })
+    const imgUrl = result.secure_url;
+    return console.log("Image uploaded to Cloudinary:", imgUrl);
+
+
+
+  }catch(error){
+    return res.status(500).json({ success: false, message: error.message || "Error creating post" });
   }
 };
+
+
 
 // ============================================================
 // GET ALL POSTS (with user info populated)
@@ -49,10 +77,12 @@ export const createPost = async (req, res) => {
 export const getAllPosts = async (req, res) => {
   try {
     // Fetch posts and also include basic user info
+    
     const posts = await Post.find().populate(
       "userId",
       "name username email profilePicture"
     );
+    console.log("Fetching all posts...");
     return res.json({ posts });
   } catch (error) {
     return res.status(500).json({ message: error.message });

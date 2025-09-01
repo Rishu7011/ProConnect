@@ -61,11 +61,12 @@ function Dashboard() {
   }, [postState.postId, dispatch]);
 
   const [postContent, setPostContent] = useState("");
-  const [fileContent, setFileContent] = useState();
+  const [fileContent, setFileContent] = useState(null);
 
   const handleUpload = async () => {
     await dispatch(createPost({ file: fileContent, body: postContent }));
-    console.log("post Created ");
+    console.log("send data successfully form dashboard")
+    
     setPostContent("");
     setFileContent(null);
     dispatch(getAllPosts());
@@ -85,7 +86,7 @@ function Dashboard() {
             <div className={styles.createPostContainer}>
               <img style={{cursor:"pointer"}} onClick={()=>{router.push(`/view_profile/${authState.user.userId.username}`)}}
                 className={styles.profilePic}
-                src={`${Base_URL}/${authState.user.userId.profilePicture}`}
+                src={authState.user.userId.profilePicture}
                 alt="profile"
               />
               <textarea
@@ -129,7 +130,7 @@ function Dashboard() {
                   <div className={styles.postHeader}>
                     <img style={{cursor:"pointer"}} onClick={()=>{router.push(`/view_profile/${post.userId.username}`)}}
                       className={styles.profilePic}
-                      src={`${Base_URL}/${post.userId.profilePicture}`}
+                      src={post.userId.profilePicture}
                       alt="user"
                     />
                     <div className={styles.postUserInfo}>
@@ -184,7 +185,7 @@ function Dashboard() {
 
                   {post.media && (
                     <div className={styles.postMedia}>
-                      <img src={`${Base_URL}/${post.media}`} alt="post media" />
+                      <img src={post.media} alt="post media" />
                     </div>
                   )}
                   <div className={styles.optionsContainer}>

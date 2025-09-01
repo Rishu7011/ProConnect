@@ -13,29 +13,12 @@ import {
     increment_likes,       // Controller function to increment likes on a post
 } from "../controllers/posts.controller.js";
 
-import multer from 'multer' // Multer is used for handling file uploads (e.g. images, videos)
 
 // Create an Express router instance
 const router = Router();
 
 
-// ============================================================
-// MULTER CONFIGURATION (FOR FILE UPLOADS)
-// ============================================================
-// Setting up storage for uploaded files
-const storage = multer.diskStorage({
-    // Destination folder for uploaded files
-    destination: (req, file, cb) => {
-        cb(null, 'uploads/'); // Files will be stored inside the 'uploads' folder
-    },
-    // Define the filename for uploaded files
-    filename: (req, file, cb) => {
-        cb(null, file.originalname); // Save file with its original name
-    }
-});
 
-// Create multer instance with defined storage configuration
-const upload = multer({ storage: storage });
 
 
 // ============================================================
@@ -46,7 +29,7 @@ const upload = multer({ storage: storage });
 router.route('/').get(activeCheck);
 
 // Route for creating a post (supports file upload via multer)
-router.route("/post").post(upload.single('media'), createPost);
+router.route("/post").post(createPost);
 
 // Route for fetching all posts
 router.route("/posts").get(getAllPosts);

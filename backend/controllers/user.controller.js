@@ -5,9 +5,9 @@ import { v2 as cloudinary } from "cloudinary";
 
 // configure with your credentials
 cloudinary.config({
-  cloud_name: "your_cloud_name",
-  api_key: "your_api_key",
-  api_secret: "your_api_secret"
+  cloud_name: process.env.cloud_name,
+  api_key: process.env.api_key,
+  api_secret: process.env.api_secret
 });
 import axios from "axios";
 

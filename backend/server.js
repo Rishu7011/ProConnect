@@ -13,11 +13,19 @@ dotenv.config();
 const app = express();
 
 // Middleware setup
-app.use(cors());                 // Enable CORS for all routes
-app.use(express.json());         // Parse incoming JSON requests
-app.use(postroutes);             // Use all routes defined in post.routes.js
-app.use(userroutes);             // Use all routes defined in user.route.js
-app.use(express.static("uploads")); // Serve static files from "uploads" folder (e.g., images, documents)
+// app.use(cors());                 // Enable CORS for all routes
+// app.use(express.json());         // Parse incoming JSON requests
+// app.use(postroutes);             // Use all routes defined in post.routes.js
+// app.use(userroutes);             // Use all routes defined in user.route.js
+// app.use(express.static("uploads")); // Serve static files from "uploads" folder (e.g., images, documents)
+// Middleware setup
+app.use(cors());                 
+app.use(express.json({ limit: "10mb" }));         // allow larger JSON payload
+app.use(express.urlencoded({ limit: "10mb", extended: true })); // allow form data too
+app.use(postroutes);             
+app.use(userroutes);             
+
+
 
 // Function to connect to MongoDB and start the server
 const start = async () => {

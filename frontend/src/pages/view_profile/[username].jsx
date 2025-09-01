@@ -89,7 +89,7 @@ function ViewProfilePage({ userProfile }) {
           <div className={styles.backDropContainer}>
             <img
               className={styles.backDropImage}
-              src={`${Base_URL}/${userProfile.userId.profilePicture}`}
+              src={userProfile.userId.profilePicture}
             />
           </div>
           <div className={styles.profileContainer}>

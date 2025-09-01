@@ -92,7 +92,7 @@ export default function ProfilePage() {
                   id="profilePictureUpload"
                 />
 
-                <img src={`${Base_URL}/${userProfile.userId.profilePicture}`} />
+                <img src={userProfile.userId.profilePicture} />
               </div>
             </div>
             <div className={styles.profileContainer}>

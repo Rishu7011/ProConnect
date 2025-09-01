@@ -14,37 +14,18 @@ import {
   acceptConnectionRequest,
   getUserProfileAndUserBasedOnUserName
 } from "../controllers/user.controller.js"; // Import controller functions
-import multer from 'multer'; // Multer is used for handling file uploads
-
 // Create an Express Router instance
 const router = Router();
 
-// ==============================
-// MULTER STORAGE CONFIGURATION
-// ==============================
-// This defines how and where the uploaded files will be stored.
-const storage = multer.diskStorage({
-  // Destination folder for uploaded files
-  destination: (req, file, cb) => {
-    cb(null, 'uploads/'); // Files will be saved inside 'uploads/' directory
-  },
-  // File naming logic
-  filename: (req, file, cb) => {
-    cb(null, file.originalname); // The file will be saved with its original name
-  }
-});
 
-// Create an upload instance using the defined storage config
-const upload = multer({ storage: storage });
 
 // ==============================
 // ROUTES
 // ==============================
 
 // Route for uploading a profile picture
-// Uses Multer middleware to handle single file upload with field name 'profile_picture'
 router.route("/update_profile_picture")
-  .post(upload.single('profile_picture'), uploadProfilePicture);
+  .post(uploadProfilePicture);
 
 // Route for registering a new user
 router.route('/register').post(register);
