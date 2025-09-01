@@ -1,12 +1,12 @@
 import { getAboutUser, getAllUsers } from "../../config/redux/action/authAction";
-import DashboardLayout from "../../layout/DashboardLayout/index.jsx";
-import UserLayout from "../../layout/UserLayout/index.jsx";
+import DashboardLayout from "../../layout/DashboardLayout";
+import UserLayout from "../../layout/UserLayout";
 import styles from "./styles.module.css";
 
 import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Base_URL } from "@/config";
-import { getAllPosts } from "@/config/redux/action/postAction";
+import { Base_URL } from "../../config";
+import { getAllPosts } from "../../config/redux/action/postAction";
 import { useRouter } from "next/router";
 export default function DiscoverPage() {
   const authState = useSelector((state) => state.auth);

@@ -1,6 +1,15 @@
 // ================================================
 // IMPORTING REQUIRED MODULES & MODELS
 // ================================================
+import { v2 as cloudinary } from "cloudinary";
+
+// configure with your credentials
+cloudinary.config({
+  cloud_name: "your_cloud_name",
+  api_key: "your_api_key",
+  api_secret: "your_api_secret"
+});
+import axios from "axios";
 
 import User from "../models/user.model.js"; // Import the User model
 import bcrypt from "bcrypt"; // For hashing passwords securely
@@ -15,44 +24,45 @@ import Profile from "../models/profile.model.js";
 // FUNCTION: Convert user profile data into a PDF file
 // ================================================
 const convertUserDataToPDF = async (userData) => {
-  // Create a new PDF document instance
   const doc = new PDFDocument();
-
-  // Generate a random file name for the PDF to avoid duplicates, add `.pdf` extension
   const outputpath = crypto.randomBytes(32).toString("hex") + ".pdf";
-
-  // Create a writable file stream where the PDF will be stored
   const stream = fs.createWriteStream("uploads/" + outputpath);
-
-  // Pipe the PDF document output into the writable file stream
   doc.pipe(stream);
 
-  // Insert the user's profile picture into the PDF (centered, width=100px)
-  doc.image(`uploads/${userData.userId.profilePicture}`, {
-    align: "center",
-    width: 100,
-  });
+  try {
+    if (userData.userId.profilePicture) {
+      // Download the Cloudinary image as a buffer
+      const response = await axios.get(userData.userId.profilePicture, {
+        responseType: "arraybuffer",
+      });
+      const buffer = Buffer.from(response.data, "binary");
 
-  // Add basic user details
+      // Insert into PDF
+      doc.image(buffer, {
+        align: "center",
+        width: 100,
+      });
+    }
+  } catch (err) {
+    console.error("Error loading profile picture:", err.message);
+  }
+
+  // Add user details
   doc.moveDown();
   doc.fontSize(14).text(`Name : ${userData.userId.username}`);
-  doc.fontSize(14).text(`email : ${userData.userId.email}`);
-  doc.fontSize(14).text(`bio : ${userData.bio}`);
+  doc.fontSize(14).text(`Email : ${userData.userId.email}`);
+  doc.fontSize(14).text(`Bio : ${userData.bio}`);
   doc.fontSize(14).text(`Current Position : ${userData.currentPost}`);
 
-
-  // Add past work experience section
-  doc.fontSize(14).text("past Work :");
-  userData.pastWork.forEach((work, index) => {
-    doc.fontSize(14).text(`company name : ${work.company}`);
-    doc.fontSize(14).text(`Positon : ${work.position}`);
+  // Work history
+  doc.fontSize(14).text("Past Work :");
+  userData.pastWork.forEach((work) => {
+    doc.fontSize(14).text(`Company : ${work.company}`);
+    doc.fontSize(14).text(`Position : ${work.position}`);
     doc.fontSize(14).text(`Years : ${work.years}`);
   });
 
-  // Finalize and save the PDF file
   doc.end();
-
-  // Return the generated PDF file name so it can be accessed later
   return outputpath;
 };
 
@@ -145,15 +155,30 @@ export const uploadProfilePicture = async (req, res) => {
       return res.status(404).json({ message: "user not found" });
     }
 
-    // Save file in the profilePicture field
-    user.profilePicture = req.file.filename;
+    if (!req.file) {
+      return res.status(400).json({ message: "No file uploaded" });
+    }
+
+    // Upload file to Cloudinary
+    const result = await cloudinary.uploader.upload(req.file.path, {
+      folder: "profile_pictures",
+      use_filename: true,
+      unique_filename: false,
+    });
+
+    // Save Cloudinary URL instead of local filename
+    user.profilePicture = result.secure_url;
     await user.save();
 
-    return res.json({ message: "profile picture updated", profilePicture: user.profilePicture });
+    return res.json({
+      message: "profile picture updated",
+      profilePicture: user.profilePicture,
+    });
   } catch (error) {
     return res.status(500).json({ message: error.message });
   }
 };
+
 
 
 // ==============================

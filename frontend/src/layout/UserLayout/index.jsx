@@ -1,4 +1,4 @@
-import NavBarComponent from "../../components/Navbar/index.jsx";
+import NavBarComponent from "../../components/Navbar";
 
 
 
