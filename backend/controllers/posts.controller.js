@@ -8,6 +8,9 @@ import bcrypt from "bcrypt"; // For password hashing (not used here)
 import Comment from "../models/comments.model.js";
 import { v2 as cloudinary } from "cloudinary";
 import fs from "fs"; // to remove local file after upload
+import multer from "multer";
+const storage = multer.memoryStorage();
+export const upload = multer({ storage });
 
 // configure with your credentials
 cloudinary.config({
@@ -28,44 +31,48 @@ export const activeCheck = async (req, res) => {
 // CREATE A POST
 // ============================================================
 export const createPost = async (req, res) => {
-  console.log("check:-1")
- try{
-  console.log("check0")
-  console.log("check0")
-  console.log("check0")
-  console.log("check0")
-  console.log("check0")
-  console.log("check0")
-  console.log("check0")
+  try {
+    const file = req.file; // multer gives this
+    const { caption } = req.body;
 
-    const formData = await res.formData()
-    console.log(formData)
-    const file = formData.get('postFile')
-    console.log("formData:", formData)
     if (!file) {
-      return response.json({ error: 'File not found' }, { status: 400 })
+      return res.status(400).json({ success: false, message: "File not found" });
     }
 
-    const bytes = await file.arrayBuffer()
-    const buffer = Buffer.from(bytes)
-
-    const result = await new Promise<CloudinaryUploadResult>((resolve, reject) => {
+    // Upload to cloudinary
+    const result = await new Promise((resolve, reject) => {
       const uploadStream = cloudinary.uploader.upload_stream(
-        { folder: 'next-cloudinary-uploads' },
+        { folder: "next-cloudinary-uploads" },
         (error, result) => {
-          if (error) reject(error)
-          else resolve(result)
+          if (error) reject(error);
+          else resolve(result);
         }
-      )
-      uploadStream.end(buffer)
-    })
-    const imgUrl = result.secure_url;
-    return console.log("Image uploaded to Cloudinary:", imgUrl);
+      );
+      uploadStream.end(file.buffer);
+    });
 
+    // Save post in MongoDB
+    const user = await User.findOne({ token: req.body.token }); // or req.user if using auth middleware
+    if (!user) return res.status(401).json({ message: "Unauthorized" });
 
+    const newPost = new Post({
+      userId: user._id,
+      caption,
+      mediaUrl: result.secure_url,
+      likes: 0,
+    });
 
-  }catch(error){
-    return res.status(500).json({ success: false, message: error.message || "Error creating post" });
+    await newPost.save();
+
+    return res.status(200).json({
+      success: true,
+      post: newPost,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: error.message || "Error creating post",
+    });
   }
 };
 
