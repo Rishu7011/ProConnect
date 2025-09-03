@@ -331,7 +331,7 @@ export const sendConnectionRequest = async (req, res) => {
       console.log("Connection request already exists");
       return res.status(400).json({ message: "Request already sent" });
     }
-    
+
 
     const request = new ConnectionRequest({ userId: user._id, connectionId });
     await request.save();
@@ -357,7 +357,7 @@ export const getMyConnectionRequest = async (req, res) => {
       userId: user._id,
     }).populate("connectionId", "name username email profilePicture");
 
-    return res.json({connections});
+    return res.json({ connections });
   } catch (error) {
     return res.status(500).json({ message: error.message });
   }
@@ -401,11 +401,11 @@ export const acceptConnectionRequest = async (req, res) => {
       return res.status(404).json({ message: "Connection not found" });
     }
 
-    if(action_type === "accept"){
-      connection.status_accepted=true;
+    if (action_type === "accept") {
+      connection.status_accepted = true;
     }
-    else{
-      connection.status_accepted=false;
+    else {
+      connection.status_accepted = false;
     }
 
     await connection.save();
@@ -428,7 +428,7 @@ export const getUserProfileAndUserBasedOnUserName = async (req, res) => {
 
     const userProfile = await Profile.findOne({ userId: user._id }).populate("userId", "name username email profilePicture");
 
-    return res.json({ "profile":userProfile });
+    return res.json({ "profile": userProfile });
   } catch (error) {
     return res.status(500).json({ message: error.message });
   }

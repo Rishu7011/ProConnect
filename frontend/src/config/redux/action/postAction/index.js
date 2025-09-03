@@ -19,19 +19,29 @@ export const getAllPosts = createAsyncThunk(
 export const createPost = createAsyncThunk(
   "post/createPost",
   async (userData, thunkAPI) => {
-    const { file, body } = userData;
+    const { file, body, token } = userData;
+
     try {
       const formData = new FormData();
-      formData.append("postFile", file);
-      formData.append("caption", body);
+      // Match backend field name
+      formData.append("media", file);
+      // Match backend body field name
+      formData.append("body", body);
+      formData.append("token", token);
 
-      const response = await clientServer.post("/post", formData);
-      return thunkAPI.fulfillWithValue(response);
+      const response = await clientServer.post("/post", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
+
+      return thunkAPI.fulfillWithValue(response.data);
     } catch (err) {
       return thunkAPI.rejectWithValue(err.response?.data || err.message);
     }
   }
 );
+
 
 
 export const deletePost = createAsyncThunk(

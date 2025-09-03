@@ -64,7 +64,7 @@ function Dashboard() {
   const [fileContent, setFileContent] = useState(null);
 
   const handleUpload = async () => {
-    await dispatch(createPost({ file: fileContent, body: postContent }));
+    await dispatch(createPost({ token: localStorage.getItem("token"),file: fileContent, body: postContent }));
     console.log("send data successfully form dashboard")
     
     setPostContent("");

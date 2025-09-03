@@ -1,23 +1,15 @@
 // ============================================================
 // IMPORT REQUIRED MODELS & LIBRARIES
 // ============================================================
+
 import Profile from "../models/profile.model.js"; // Profile model (not used yet here)
 import User from "../models/user.model.js"; // User model
 import Post from "../models/post.model.js"; // Post model
 import bcrypt from "bcrypt"; // For password hashing (not used here)
 import Comment from "../models/comments.model.js";
-import { v2 as cloudinary } from "cloudinary";
-import fs from "fs"; // to remove local file after upload
-import multer from "multer";
-const storage = multer.memoryStorage();
-export const upload = multer({ storage });
+import cloudinary from "./utils/cloudinary.js";
+import fs from "fs";
 
-// configure with your credentials
-cloudinary.config({
-  cloud_name: process.env.cloud_name,
-  api_key: process.env.api_key,
-  api_secret: process.env.api_secret
-});
 import axios from "axios";
 import { response } from "express";
 // ============================================================
@@ -27,54 +19,46 @@ export const activeCheck = async (req, res) => {
   return res.status(200).json({ message: "RUNNING" }); // Health check endpoint
 };
 
+
+
 // ============================================================
 // CREATE A POST
 // ============================================================
 export const createPost = async (req, res) => {
+
+  const { token } = req.body;
   try {
-    const file = req.file; // multer gives this
-    const { caption } = req.body;
-
-    if (!file) {
-      return res.status(400).json({ success: false, message: "File not found" });
+    const user = await User.findOne({ token });
+    if (!user) {
+      return res.status(401).json({ success: false, message: "Unauthorized" });
     }
+    if (!req.file) {
+      console.log("No file uploaded")
+    }
+    // upload the file on cloudinary
+    const response = await cloudinary.uploader.upload(req.file.path, {
+      resource_type: "auto"
+    })
+    // file has been uploaded successfully
+    console.log("File uploaded successfully", response.url);
 
-    // Upload to cloudinary
-    const result = await new Promise((resolve, reject) => {
-      const uploadStream = cloudinary.uploader.upload_stream(
-        { folder: "next-cloudinary-uploads" },
-        (error, result) => {
-          if (error) reject(error);
-          else resolve(result);
-        }
-      );
-      uploadStream.end(file.buffer);
-    });
-
-    // Save post in MongoDB
-    const user = await User.findOne({ token: req.body.token }); // or req.user if using auth middleware
-    if (!user) return res.status(401).json({ message: "Unauthorized" });
-
-    const newPost = new Post({
+    const post = new Post({
       userId: user._id,
-      caption,
-      mediaUrl: result.secure_url,
-      likes: 0,
+      body: req.body.body,
+      media: response.url || null,
     });
+    await post.save();
+    return res.status(200).json({ success: true, post });
 
-    await newPost.save();
-
-    return res.status(200).json({
-      success: true,
-      post: newPost,
-    });
   } catch (error) {
-    return res.status(500).json({
-      success: false,
-      message: error.message || "Error creating post",
-    });
+    fs.unlinkSync(req.file.path);// Remove the locally saved temporary file as the upload operation got failed
+    return res.status(500).json({ success: false, message: "File upload failed",error: error.message });
   }
+
+
+ 
 };
+
 
 
 
@@ -84,12 +68,11 @@ export const createPost = async (req, res) => {
 export const getAllPosts = async (req, res) => {
   try {
     // Fetch posts and also include basic user info
-    
+
     const posts = await Post.find().populate(
       "userId",
       "name username email profilePicture"
     );
-    console.log("Fetching all posts...");
     return res.json({ posts });
   } catch (error) {
     return res.status(500).json({ message: error.message });
@@ -176,11 +159,11 @@ export const get_comments_by_post = async (req, res) => {
       return res.status(404).json({ message: "Post not found" });
     }
     const comments = await Comment
-    .find({ postId: post_id })
-    .populate(
-      "userId",
-      "username name"
-    );
+      .find({ postId: post_id })
+      .populate(
+        "userId",
+        "username name"
+      );
     console.log("Comments found:", comments.length)
     return res.status(202).json(comments.reverse());
   } catch (error) {

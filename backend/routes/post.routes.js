@@ -13,6 +13,17 @@ import {
     increment_likes,       // Controller function to increment likes on a post
 } from "../controllers/posts.controller.js";
 
+import multer from "multer"
+const storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+        cb(null, "./public/temp") // Set the upload directory
+    },
+    filename: function (req, file, cb) {
+        // const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9)
+        cb(null, file.originalname) // Set the file name
+    }
+})
+const upload = multer({ storage: storage })
 
 // Create an Express router instance
 const router = Router();
@@ -29,19 +40,19 @@ const router = Router();
 router.route('/').get(activeCheck);
 
 // Route for creating a post (supports file upload via multer)
-router.route("/post").post(createPost);
+router.post("/post",upload.single("media"),createPost);
 
 // Route for fetching all posts
-router.route("/posts").get(getAllPosts);
+router.get("/posts", getAllPosts);
 
 // Route for deleting a specific post
-router.route("/delete_post").delete(deletePost);
+router.delete("/delete_post", deletePost);
 
 // Route for adding a comment to a post
-router.route("/comment").post(commentPost);
+router.post("/comment", commentPost);
 
 // Route for fetching comments of a specific post
-router.route("/get_comments").get(get_comments_by_post);
+router.get("/get_comments", get_comments_by_post);
 
 // Route for deleting a specific comment
 router.route("/delete_comment").delete(delete_comment_of_user);

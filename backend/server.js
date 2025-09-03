@@ -19,11 +19,20 @@ const app = express();
 // app.use(userroutes);             // Use all routes defined in user.route.js
 // app.use(express.static("uploads")); // Serve static files from "uploads" folder (e.g., images, documents)
 // Middleware setup
-app.use(cors());                 
-app.use(express.json({ limit: "10mb" }));         // allow larger JSON payload
-app.use(express.urlencoded({ limit: "10mb", extended: true })); // allow form data too
-app.use(postroutes);             
-app.use(userroutes);             
+
+// Middleware
+app.use(cors());
+app.use(express.json({ limit: "10mb" }));
+app.use(express.urlencoded({ limit: "10mb", extended: true }));
+app.use( postroutes);
+app.use(userroutes);
+app.use("/uploads", express.static("uploads")); // serve local files if needed
+
+// Error handler
+app.use((err, req, res, next) => {
+  console.error("❌ Server Error:", err.stack);
+  res.status(500).json({ success: false, message: err.message });
+});;             
 
 
 
