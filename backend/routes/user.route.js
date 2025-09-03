@@ -16,6 +16,17 @@ import {
 } from "../controllers/user.controller.js"; // Import controller functions
 // Create an Express Router instance
 const router = Router();
+import multer from "multer"
+const storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+        cb(null, "./public/temp") // Set the upload directory
+    },
+    filename: function (req, file, cb) {
+        // const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9)
+        cb(null, file.originalname) // Set the file name
+    }
+})
+const upload = multer({ storage: storage })
 
 
 
@@ -25,7 +36,7 @@ const router = Router();
 
 // Route for uploading a profile picture
 router.route("/update_profile_picture")
-  .post(uploadProfilePicture);
+  .post(upload.single('profilePicture'), uploadProfilePicture);
 
 // Route for registering a new user
 router.route('/register').post(register);

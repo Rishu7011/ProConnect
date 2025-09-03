@@ -1,14 +1,7 @@
 // ================================================
 // IMPORTING REQUIRED MODULES & MODELS
 // ================================================
-import { v2 as cloudinary } from "cloudinary";
 
-// configure with your credentials
-cloudinary.config({
-  cloud_name: process.env.cloud_name,
-  api_key: process.env.api_key,
-  api_secret: process.env.api_secret
-});
 import axios from "axios";
 
 import User from "../models/user.model.js"; // Import the User model
@@ -18,6 +11,10 @@ import PDFDocument from "pdfkit"; // To dynamically create PDF files
 import fs from "fs"; // Node.js File System module for reading/writing files
 import ConnectionRequest from "../models/connection.model.js";
 import Profile from "../models/profile.model.js";
+import path from "path";
+import { v2 as cloudinary } from "cloudinary";
+import dotenv from "dotenv";
+dotenv.config();
 
 
 // ================================================
@@ -148,6 +145,11 @@ export const login = async (req, res) => {
 // ==============================
 export const uploadProfilePicture = async (req, res) => {
   const { token } = req.body;
+  cloudinary.config({
+    cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+    api_key: process.env.CLOUDINARY_API_KEY,
+    api_secret: process.env.CLOUDINARY_API_SECRET,
+  });
 
   try {
     const user = await User.findOne({ token });
@@ -160,7 +162,8 @@ export const uploadProfilePicture = async (req, res) => {
     }
 
     // Upload file to Cloudinary
-    const result = await cloudinary.uploader.upload(req.file.path, {
+    const filePath = path.resolve(req.file.path);
+    const result = await cloudinary.uploader.upload(filePath, {
       folder: "profile_pictures",
       use_filename: true,
       unique_filename: false,
@@ -169,12 +172,13 @@ export const uploadProfilePicture = async (req, res) => {
     // Save Cloudinary URL instead of local filename
     user.profilePicture = result.secure_url;
     await user.save();
-
+    fs.unlinkSync(req.file.path);
     return res.json({
       message: "profile picture updated",
       profilePicture: user.profilePicture,
     });
   } catch (error) {
+    fs.unlinkSync(req.file.path);
     return res.status(500).json({ message: error.message });
   }
 };

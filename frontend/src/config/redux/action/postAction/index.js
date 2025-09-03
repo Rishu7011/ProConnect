@@ -43,6 +43,28 @@ export const createPost = createAsyncThunk(
 );
 
 
+export const profilePicture = createAsyncThunk(
+  "post/profilePicture",
+  async (userData, thunkAPI) => {
+    const { file,token } = userData;
+    try {
+      const formData = new FormData();
+      // Match backend field name
+      formData.append("profilePicture", file);
+      // Match backend body field name
+      formData.append("token", token);
+
+      const response = await clientServer.post("/update_profile_picture", formData,{
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
+      return thunkAPI.fulfillWithValue(response.data);
+    } catch (err) {
+      return thunkAPI.rejectWithValue(err.response?.data || err.message);
+    }
+  }
+);
 
 export const deletePost = createAsyncThunk(
   "post/deletePost",
@@ -87,7 +109,7 @@ export const getAllComments = createAsyncThunk(
       });
       return thunkAPI.fulfillWithValue({
         comments: response.data,
-        post_id: postData.post_id,
+        // post_id: postData.post_id,
       });
     } catch (error) {
       return thunkAPI.rejectWithValue(

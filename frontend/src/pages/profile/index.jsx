@@ -6,7 +6,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { use, useEffect, useState } from "react";
 import { getAboutUser } from "@/config/redux/action/authAction";
 import { useRouter } from "next/router";
-import { getAllPosts } from "@/config/redux/action/postAction";
+import { getAllPosts, profilePicture } from "@/config/redux/action/postAction";
 
 export default function ProfilePage() {
   const dispatch = useDispatch();
@@ -21,9 +21,9 @@ export default function ProfilePage() {
     position: "",
     years: "",
   });
-  const handleWorkInputChange = (e) =>{
-    const {name,value} = e.target;
-    setInputData({...inputData,[name]:value});
+  const handleWorkInputChange = (e) => {
+    const { name, value } = e.target;
+    setInputData({ ...inputData, [name]: value });
 
 
   }
@@ -42,19 +42,8 @@ export default function ProfilePage() {
   }, [authState.user, postReducer.posts]);
 
   const uploadProfilePicture = async (file) => {
-    const formData = new FormData();
-    formData.append("profile_picture", file);
-    formData.append("token", localStorage.getItem("token"));
-    const response = await clientServer.post(
-      "/update_profile_picture",
-      formData,
-      {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      }
-    );
-    dispatch(getAboutUser({ token: localStorage.getItem("token") }));
+    await dispatch( profilePicture({token: localStorage.getItem("token"), file: file}));
+    await dispatch(getAboutUser({ token: localStorage.getItem("token") }));
     console.log("upload successful");
   };
 
@@ -127,12 +116,12 @@ export default function ProfilePage() {
                     </div>
 
                     <div>
-                      <textarea className={styles.textareaBio} 
-                      value={userProfile.bio}
-                      onChange={(e)=>{
-                        setUserProfile({...userProfile,bio:e.target.value})
-                      }}
-                      row={Math.max(3,Math.ceil(userProfile.bio.length/80))}
+                      <textarea className={styles.textareaBio}
+                        value={userProfile.bio}
+                        onChange={(e) => {
+                          setUserProfile({ ...userProfile, bio: e.target.value })
+                        }}
+                        row={Math.max(3, Math.ceil(userProfile.bio.length / 80))}
                       />
                     </div>
                   </div>
@@ -145,7 +134,7 @@ export default function ProfilePage() {
                             <div className={styles.card_profileContainer}>
                               {post.media !== "" ? (
                                 <img
-                                  src={`${Base_URL}/${post.media}`}
+                                  src={post.media}
                                   alt="recent added"
                                 />
                               ) : (
@@ -197,30 +186,30 @@ export default function ProfilePage() {
 
 
         <div>
-                    {isModelOpen && (
-                      <div
-                        onClick={() => {
-                          setIsModelOpen(false);
-                        }}
-                        className={styles.commentsContainer}
-                      >
-                        <div
-                          onClick={(e) => {
-                            e.stopPropagation();
-                          }}
-                          className={styles.allCommentsContainer}
-                        >
-                            <input onChange={handleWorkInputChange} name="company" className={styles.inputField}  type="text"  placeholder="Enter Company" />
-                            <input onChange={handleWorkInputChange} name="position" className={styles.inputField} type="text" placeholder="Enter Position"/>
-                            <input onChange={handleWorkInputChange} name="years" className={styles.inputField} type="number" placeholder="Enter Years"/>
-                            <button onClick={()=>{
-                              setUserProfile({...userProfile,pastWork:[...userProfile.pastWork,inputData]})
-                              setIsModelOpen(false);
-                            }} className={styles.updateProfileBtn}>Add Work</button>
-                        </div>
-                      </div>
-                    )}
-                  </div>
+          {isModelOpen && (
+            <div
+              onClick={() => {
+                setIsModelOpen(false);
+              }}
+              className={styles.commentsContainer}
+            >
+              <div
+                onClick={(e) => {
+                  e.stopPropagation();
+                }}
+                className={styles.allCommentsContainer}
+              >
+                <input onChange={handleWorkInputChange} name="company" className={styles.inputField} type="text" placeholder="Enter Company" />
+                <input onChange={handleWorkInputChange} name="position" className={styles.inputField} type="text" placeholder="Enter Position" />
+                <input onChange={handleWorkInputChange} name="years" className={styles.inputField} type="number" placeholder="Enter Years" />
+                <button onClick={() => {
+                  setUserProfile({ ...userProfile, pastWork: [...userProfile.pastWork, inputData] })
+                  setIsModelOpen(false);
+                }} className={styles.updateProfileBtn}>Add Work</button>
+              </div>
+            </div>
+          )}
+        </div>
       </DashboardLayout>
     </UserLayout>
   );

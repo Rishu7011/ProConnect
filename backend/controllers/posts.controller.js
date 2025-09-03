@@ -7,11 +7,13 @@ import User from "../models/user.model.js"; // User model
 import Post from "../models/post.model.js"; // Post model
 import bcrypt from "bcrypt"; // For password hashing (not used here)
 import Comment from "../models/comments.model.js";
-import cloudinary from "./utils/cloudinary.js";
+// import cloudinary from './utils/cloudinary.js'
 import fs from "fs";
+import path from "path";
+import { v2 as cloudinary } from "cloudinary";
+import dotenv from "dotenv";
+dotenv.config();
 
-import axios from "axios";
-import { response } from "express";
 // ============================================================
 // CHECK SERVER STATUS
 // ============================================================
@@ -27,20 +29,27 @@ export const activeCheck = async (req, res) => {
 export const createPost = async (req, res) => {
 
   const { token } = req.body;
+  cloudinary.config({
+    cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+    api_key: process.env.CLOUDINARY_API_KEY,
+    api_secret: process.env.CLOUDINARY_API_SECRET,
+  });
   try {
     const user = await User.findOne({ token });
     if (!user) {
       return res.status(401).json({ success: false, message: "Unauthorized" });
     }
     if (!req.file) {
-      console.log("No file uploaded")
+      return res.status(400).json({ success: false, message: "No file uploaded" });
     }
     // upload the file on cloudinary
-    const response = await cloudinary.uploader.upload(req.file.path, {
+    const filePath = path.resolve(req.file.path);
+    const response = await cloudinary.uploader.upload(filePath, {
+      folder: "posts",
       resource_type: "auto"
     })
     // file has been uploaded successfully
-    console.log("File uploaded successfully", response.url);
+    console.log("File uploaded successfully", response);
 
     const post = new Post({
       userId: user._id,
@@ -48,9 +57,11 @@ export const createPost = async (req, res) => {
       media: response.url || null,
     });
     await post.save();
+    fs.unlinkSync(req.file.path);
     return res.status(200).json({ success: true, post });
 
   } catch (error) {
+    console.log("code is in catch part.............", error)
     fs.unlinkSync(req.file.path);// Remove the locally saved temporary file as the upload operation got failed
     return res.status(500).json({ success: false, message: "File upload failed",error: error.message });
   }
@@ -177,7 +188,7 @@ export const get_comments_by_post = async (req, res) => {
 export const delete_comment_of_user = async (req, res) => {
   const { token, comment_id } = req.body;
   try {
-    // Validate user (⚠️ currently querying Post with token, probably should query User)
+    // Validate user (⚠ currently querying Post with token, probably should query User)
     const token = await Post.findOne({ token: token }).select("_id");
     if (!token) {
       return res.status(401).json({ message: "User not found" });
@@ -210,7 +221,7 @@ export const increment_likes = async (req, res) => {
   try {
     const post = await Post.findOne({ _id: post_id });
     if (!post) {
-      return res.status(500).json({ message: "Post not found" });
+      return res.status(404).json({ message: "Post not found" });
     }
 
     // Increase like count
