@@ -61,13 +61,13 @@ export const createPost = async (req, res) => {
     return res.status(200).json({ success: true, post });
 
   } catch (error) {
-    console.log("code is in catch part.............", error)
+
     fs.unlinkSync(req.file.path);// Remove the locally saved temporary file as the upload operation got failed
-    return res.status(500).json({ success: false, message: "File upload failed",error: error.message });
+    return res.status(500).json({ success: false, message: "File upload failed", error: error.message });
   }
 
 
- 
+
 };
 
 
@@ -96,37 +96,65 @@ export const getAllPosts = async (req, res) => {
 export const deletePost = async (req, res) => {
   const { token, post_id } = req.body;
 
+  cloudinary.config({
+    cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+    api_key: process.env.CLOUDINARY_API_KEY,
+    api_secret: process.env.CLOUDINARY_API_SECRET,
+  });
+
   try {
-    // Find user by token
-    const user = await User.findOne({ token: token }).select("id");
-    if (!user) {
-      return res.status(404).json({ message: "user not found" });
+    // Find user by token and ensure _id is selected
+    const user = await User.findOne({ token: token }).select("_id");
+    if (!user || !user._id) {
+      return res.status(404).json({ success: false, message: "User not found" });
     }
 
     // Find post by id
-    const post = await Post.deleteOne({ _id: post_id });
-    if (!post) {
-      return res.status(404).json({ message: "post not found" });
+    const post = await Post.findById(post_id);
+    if (!post || !post.userId) {
+      return res.status(404).json({ success: false, message: "Post not found or invalid" });
     }
 
     // Check if post belongs to user
     if (post.userId.toString() !== user._id.toString()) {
-      return res.status(401).json({ message: "Unauthorized" });
+      return res.status(401).json({ success: false, message: "Unauthorized" });
     }
 
-    // Delete post
-    await Post.deletePost({ _id: post_id });
-    return res.json({ message: "post" });
+    // If media exists, delete from Cloudinary
+    if (post.media) {
+      try {
+        console.log("Post media URL:", post.media);
+        const segments = post.media.split('/');
+        const folder = segments[segments.length - 2];
+        const filenameWithExtension = segments[segments.length - 1];
+        const publicId = `${folder}/${filenameWithExtension.split('.')[0]}`;
+
+        console.log("Full publicId to delete:", publicId);
+
+        const result = await cloudinary.uploader.destroy(publicId, { resource_type: "image" });
+        console.log("Cloudinary deletion result:", result);
+      } catch (cloudErr) {
+        console.error("Cloudinary deletion error:", cloudErr);
+      }
+    }
+
+    // Delete the post from database
+    await Post.deleteOne({ _id: post_id });
+
+    return res.status(200).json({ success: true, message: "Post deleted successfully" });
   } catch (error) {
-    return res.status(500).json({ message: error.message });
+    console.error("Server error:", error);
+    return res.status(500).json({ success: false, message: error.message });
   }
 };
+
 
 // ============================================================
 // ADD A COMMENT TO A POST
 // ============================================================
 export const commentPost = async (req, res) => {
   const { token, post_id, commentBody } = req.body;
+
   try {
     // Validate user by token
     const user = await User.findOne({ token: token }).select("_id");
@@ -161,10 +189,10 @@ export const commentPost = async (req, res) => {
 // ============================================================
 export const get_comments_by_post = async (req, res) => {
   const { post_id } = req.query;
-  console.log("Fetching comments for post:", post_id);
+
   try {
     const post = await Post.findOne({ _id: post_id });
-    console.log("post_id from query:", req.query.post_id);
+
 
     if (!post) {
       return res.status(404).json({ message: "Post not found" });
