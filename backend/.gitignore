@@ -10,9 +10,7 @@ Thumbs.db
 dist/
 build/
 coverage/
-*.tmp
-*.temp
+
 .vscode/
 .idea/
 api.http
-uploads
