@@ -81,7 +81,27 @@ function ViewProfilePage({ userProfile }) {
   useEffect(() => {
     console.log("from View:View Profile");
   }, []);
-
+  
+  useEffect(() => {
+    if (!authState.all_profiles_fetched) {
+      dispatch(getAllUsers());
+    }
+    
+  }, [authState.all_profiles_fetched,dispatch]);
+    useEffect(() => {
+      if (authState.isTokenThere) {
+        dispatch(getAllPosts());
+        dispatch(getAboutUser({ token: localStorage.getItem("token") }));
+      }
+      if (!authState.all_profiles_fetched) {
+        dispatch(getAllUsers());
+      }
+    }, [authState.isTokenThere]);
+  useEffect(()=>{
+    if (authState.profileFetched) {
+      dispatch(getAboutUser());
+    }
+  },[authState.profileFetched,dispatch])
   return (
     <UserLayout>
       <DashboardLayout>

@@ -61,11 +61,11 @@ export const getAboutUser = createAsyncThunk(
   async (user, thunkAPI) => {
     // We don't need any arguments, so use '_'
     try {
-      // const token = localStorage.getItem("token"); // ✅ Get token directly
+      const token = localStorage.getItem("token"); // ✅ Get token directly
 
-      // if (!token) {
-      //   return thunkAPI.rejectWithValue({ message: "No token found" });
-      // }
+      if (!token) {
+        return thunkAPI.rejectWithValue({ message: "No token found" });
+      }
       const response = await clientServer.get("/get_user_and_profile", {
         params: { token: user.token }, // ✅ Use the token from localStorage
       });

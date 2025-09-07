@@ -94,6 +94,7 @@ function DashboardLayout({ children }) {
           {authState.all_profiles_fetched && authState.all_users.map((profile)=>{
             return(
               <div style={{cursor:"pointer"}} onClick={()=>{router.push(`/view_profile/${profile.userId.username}`)}} key={profile._id} className={styles.extraContainer_profile}>
+                <img src={profile.userId.profilePicture} alt="profile pic" />
                 <p>{profile.userId.name}</p>
               </div>
             )

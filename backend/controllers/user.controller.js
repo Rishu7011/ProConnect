@@ -1,4 +1,3 @@
-// ================================================
 // IMPORTING REQUIRED MODULES & MODELS
 // ================================================
 
@@ -126,7 +125,7 @@ export const login = async (req, res) => {
     // Compare given password with stored hashed password
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
-      return res.status(400).json({ message: "Invalid credentials" });
+      return res.status(400).json({ message: "Invalid Password" });
     }
 
     // Generate a random token (used for session-like behavior)

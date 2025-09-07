@@ -24,26 +24,26 @@ export default function MyConnectionPage() {
 
   },[authState.connectionRequest])
 
-  // useEffect(() => {
-  //   if (!authState.all_profiles_fetched) {
-  //     dispatch(getAllUsers());
-  //   }
+  useEffect(() => {
+    if (!authState.all_profiles_fetched) {
+      dispatch(getAllUsers());
+    }
     
-  // }, [authState.all_profiles_fetched,dispatch]);
-  //   useEffect(() => {
-  //     if (authState.isTokenThere) {
-  //       dispatch(getAllPosts());
-  //       dispatch(getAboutUser({ token: localStorage.getItem("token") }));
-  //     }
-  //     if (!authState.all_profiles_fetched) {
-  //       dispatch(getAllUsers());
-  //     }
-  //   }, [authState.isTokenThere]);
-  // useEffect(()=>{
-  //   if (authState.profileFetched) {
-  //     dispatch(getAboutUser());
-  //   }
-  // },[authState.profileFetched,dispatch])
+  }, [authState.all_profiles_fetched,dispatch]);
+    useEffect(() => {
+      if (authState.isTokenThere) {
+        dispatch(getAllPosts());
+        dispatch(getAboutUser({ token: localStorage.getItem("token") }));
+      }
+      if (!authState.all_profiles_fetched) {
+        dispatch(getAllUsers());
+      }
+    }, [authState.isTokenThere]);
+  useEffect(()=>{
+    if (authState.profileFetched) {
+      dispatch(getAboutUser());
+    }
+  },[authState.profileFetched,dispatch])
   return (
     <UserLayout>
       <DashboardLayout>
@@ -55,10 +55,10 @@ export default function MyConnectionPage() {
               <div onClick={()=>{
                 router.push(`/view_profile/${user.userId.username}`)
               }} className={styles.userCard} key={index}>
-                <div className={styles.profilePicture}><img src={`${Base_URL}/${user.userId.profilePicture}`} alt={user.userId.name} /></div>
+                <div className={styles.profilePicture}><img src={user.userId.profilePicture} alt={user.userId.name} /></div>
                 <div className={styles.userInfo}>
                   <h3>{user.userId.name}</h3>
-                  <p>{user.userId.username}</p>
+                  <p>@{user.userId.username}</p>
                 </div>
                 <button onClick={(e)=>{
                   e.stopPropagation();
@@ -73,10 +73,10 @@ export default function MyConnectionPage() {
               <div onClick={()=>{
                 router.push(`/view_profile/${user.userId.username}`)
               }} className={styles.userCard} key={index}>
-                <div className={styles.profilePicture}><img src={`${Base_URL}/${user.userId.profilePicture}`} alt={user.userId.name} /></div>
+                <div className={styles.profilePicture}><img src={user.userId.profilePicture} alt={user.userId.name} /></div>
                 <div className={styles.userInfo}>
                   <h3>{user.userId.name}</h3>
-                  <p>{user.userId.username}</p>
+                  <p>@{user.userId.username}</p>
                 </div>
                 
               </div>

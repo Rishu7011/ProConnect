@@ -29,6 +29,33 @@ function Dashboard() {
   const authState = useSelector((state) => state.auth);
   const postState = useSelector((state) => state.posts);
   const [commentText, setCommentText] = useState("");
+  const [Loading, setLoading] = useState(false);
+  const Loader = () => {
+  return (
+    <svg width="50" height="50" viewBox="0 0 50 50" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <circle 
+        cx="25" 
+        cy="25" 
+        r="20" 
+        stroke="white" 
+        strokeWidth="4" 
+        strokeLinecap="round" 
+        strokeDasharray="31.4 31.4"
+      >
+        <animateTransform 
+          attributeName="transform"
+          type="rotate"
+          from="0 25 25"
+          to="360 25 25"
+          dur="1s"
+          repeatCount="indefinite"
+        />
+      </circle>
+    </svg>
+  );
+};
+
+
   useEffect(() => {
     if (localStorage.getItem("token") === null) {
       router.push("/login");
@@ -64,13 +91,24 @@ function Dashboard() {
   const [fileContent, setFileContent] = useState(null);
 
   const handleUpload = async () => {
-    await dispatch(createPost({ token: localStorage.getItem("token"),file: fileContent, body: postContent }));
-    console.log("send data successfully form dashboard")
-    
+  setLoading(true);  // ✅ Set Loading to true when starting the upload
+  try {
+    await dispatch(createPost({
+      token: localStorage.getItem("token"),
+      file: fileContent,
+      body: postContent
+    }));
+    console.log("Post sent successfully from dashboard");
     setPostContent("");
     setFileContent(null);
-    dispatch(getAllPosts());
-  };
+    await dispatch(getAllPosts());  // ✅ Optionally wait before finishing
+  } catch (error) {
+    console.error("Error posting:", error);
+  } finally {
+    setLoading(false);  // ✅ Set Loading to false after finishing
+  }
+};
+
   // useState(()=>{
   //   setInterval(()=>{
   //     dispatch(getAllPosts())
@@ -118,7 +156,7 @@ function Dashboard() {
               />
               {postContent.length > 0 && (
                 <button onClick={handleUpload} className={styles.uploadButton}>
-                  Upload
+                  {Loading? <Loader /> : "Post"}
                 </button>
               )}
             </div>
