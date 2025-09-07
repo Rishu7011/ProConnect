@@ -13,6 +13,8 @@ import Profile from "../models/profile.model.js";
 import path from "path";
 import { v2 as cloudinary } from "cloudinary";
 import dotenv from "dotenv";
+import { sendOtpEmail } from "./sendMail.js";
+import OTPModel from "../models/OTP.model.js";
 dotenv.config();
 
 
@@ -62,16 +64,20 @@ const convertUserDataToPDF = async (userData) => {
   return outputpath;
 };
 
+
 // ==============================
 // REGISTER A NEW USER
 // ==============================
 export const register = async (req, res) => {
   try {
-    const { name, email, password, username } = req.body;
+    const { name, email, password, username, Userotp } = req.body;
 
     // Check if all required fields are provided
     if (!name || !email || !password || !username) {
       return res.status(400).json({ message: "All fields are required" });
+    }
+    if (!Userotp) {
+      return res.status(400).json({ message: "OTP is required" });
     }
 
     // Check if a user with the same email already exists
@@ -79,8 +85,18 @@ export const register = async (req, res) => {
     if (existingUser) {
       return res.status(400).json({ message: "User already exists" });
     }
+    const otpEntry = await OTPModel.findOne({ email });
+    if (!otpEntry) {
+      return res.status(400).json({ message: "OTP expired or not found" });
+    }
 
+    const isOtpValid = await bcrypt.compare(Userotp, otpEntry.otp);
+    if (!isOtpValid) {
+      return res.status(400).json({ message: "Invalid OTP" });
+    }
     // Hash the password before saving to the database
+
+    await OTPModel.deleteOne({ email });
     const hashedPassword = await bcrypt.hash(password, 10);
 
     // Create and save the new user
@@ -100,6 +116,40 @@ export const register = async (req, res) => {
     return res.status(201).json({ message: "User created successfully" });
   } catch (error) {
     // Handle unexpected errors
+    return res.status(500).json({ message: error.message });
+  }
+};
+// ==============================
+// Verify Otp
+// ==============================
+
+export const sendOtp = async (req, res) => {
+  try {
+    const { email } = req.body;
+
+    // Check if email is provided
+    if (!email) {
+      return res.status(400).json({ message: "Email is required" });
+    }
+
+    // Find user by email
+    const user = await User.findOne({ email });
+    if (user) {
+      return res.status(404).json({ message: "User already exists" });
+    }
+
+    // Generate and send OTP (this is a placeholder, implement actual email sending)
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+    console.log(`Generated OTP for ${email}: ${otp}`);
+    const otpHash = await bcrypt.hash(otp, 10);
+    sendOtpEmail(email, otp);
+
+    const otpEntry = new OTPModel({ email, otp: otpHash });
+    await otpEntry.save();
+
+    // OTP is valid, proceed with login or other actions
+    return res.json({ message: "OTP sent successfully" });
+  } catch (error) {
     return res.status(500).json({ message: error.message });
   }
 };

@@ -12,7 +12,8 @@ import {
   getMyConnectionRequest,
   WhatAreMyConnections,
   acceptConnectionRequest,
-  getUserProfileAndUserBasedOnUserName
+  getUserProfileAndUserBasedOnUserName,
+  sendOtp
 } from "../controllers/user.controller.js"; // Import controller functions
 // Create an Express Router instance
 const router = Router();
@@ -65,6 +66,7 @@ router.route("/user/getConnectionRequest").get(getMyConnectionRequest)
 router.route("/user/user_connection_request").get(WhatAreMyConnections)
 router.route("/user/accept_connection_request").post(acceptConnectionRequest)
 router.route("/user/get_profile_based_on_username").get(getUserProfileAndUserBasedOnUserName)
+router.route("/send_otp").post(sendOtp)
 
 // Export the router to be used in the main app
 export default router;

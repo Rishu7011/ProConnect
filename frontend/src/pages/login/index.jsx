@@ -3,7 +3,7 @@ import styles from "./styles.module.css";
 import { useDispatch, useSelector } from "react-redux";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
-import { loginUser, registerUser } from "@/config/redux/action/authAction";
+import { loginUser, otpSend, registerUser } from "@/config/redux/action/authAction";
 import { EmptyMessage } from "@/config/redux/reducer/authReducer";
 
 function Login() {
@@ -17,29 +17,35 @@ function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
+  const [otp, setOtp] = useState("")
   useEffect(() => {
     if (authState.loggedIn) {
       router.push("/dashboard");
     }
   }, [authState.loggedIn, router]);
-  useEffect(()=>{
+  useEffect(() => {
     disPath(EmptyMessage())
-  },[userLoginMethod])
-  useEffect(()=>{
-    if(localStorage.getItem("token")){
+  }, [userLoginMethod])
+  useEffect(() => {
+    if (localStorage.getItem("token")) {
       router.push("/dashboard")
     }
-  },[])
+  }, [])
 
   const handleRegister = () => {
     // handle register logic here
     console.log("registering...");
-    disPath(registerUser({ username, email, password, name }));
+    disPath(registerUser({ username, email, password, name, otp }));
   };
 
-  const handleLogin =() => {
+  const handleOtpSend = () => {
+    console.log("sending otp....")
+    disPath(otpSend({ email }))
+  };
+
+  const handleLogin = () => {
     console.log("login ....")
-    disPath(loginUser({email,password}))
+    disPath(loginUser({ email, password }))
   }
   return (
     <>
@@ -97,12 +103,17 @@ function Login() {
                   {showPassword ? "👁️" : "🙈"}
                 </span>
               </div>
+              {!userLoginMethod &&
+                <div style={{ display: "flex", gap: "10px" }}>
+                  <input value={otp} onChange={(e) => setOtp(e.target.value)} className={styles.inputField} name="otp" placeholder="Enter OTP" />
+                  <button onClick={handleOtpSend} className={styles.Button_withOutline}>Send OTP</button>
+                </div>}
 
               <button
                 onClick={() => {
-                  if (userLoginMethod){
+                  if (userLoginMethod) {
                     handleLogin()
-                  }else{
+                  } else {
                     handleRegister();
                   }
                 }}
@@ -111,14 +122,14 @@ function Login() {
                 {userLoginMethod ? "Sign in" : "Sign Up"}
               </button>
             </div>
-            <br/>
-            <div onClick={()=>{
+            <br />
+            <div onClick={() => {
               setUserLoginMethod(!userLoginMethod)
             }} className={styles.login_toggle_text}>
               <p>{!userLoginMethod ? "Already have an account ?" : "For new user"}</p>
             </div>
           </div>
-          
+
           <div className={styles.card_container_right}>
 
           </div>

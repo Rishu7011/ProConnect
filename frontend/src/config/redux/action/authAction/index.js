@@ -33,18 +33,34 @@ export const loginUser = createAsyncThunk(
   }
 );
 
+export const otpSend = createAsyncThunk(
+  "user/otpSend",
+  async (user, thunkAPI) => {
+    try {
+      const response = await clientServer.post(`/send_otp`, {
+        email: user.email,
+      });
+      return thunkAPI.fulfillWithValue(response.data);
+    } catch (error) {
+      return thunkAPI.rejectWithValue(error.response.data);
+    }
+  }
+);
+
 // Async thunk for registering a new user
 export const registerUser = createAsyncThunk(
   "user/register", // Action type string for Redux
   async (user, thunkAPI) => {
     // Async function that receives user registration data
     try {
+      
       // Make POST request to '/register' endpoint with user details
       const response = await clientServer.post(`/register`, {
         email: user.email,
         password: user.password,
         username: user.username,
         name: user.name,
+        Userotp: user.otp
       });
 
       // Return token as fulfilled value to update Redux state
