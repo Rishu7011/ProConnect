@@ -14,7 +14,7 @@ import path from "path";
 import { v2 as cloudinary } from "cloudinary";
 import dotenv from "dotenv";
 import { sendOtpEmail } from "./sendMail.js";
-import OTPModel from "../models/OTP.model.js";
+import OTPModel from "../models/otpModel.js";
 dotenv.config();
 
 
