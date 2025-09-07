@@ -1,68 +1,60 @@
 // ============================================================
 // IMPORT REQUIRED MODULES
 // ============================================================
-import { Router } from "express"; // Importing Router from Express for handling routes
+import { Router } from "express";
+import multer from "multer"; // For handling file uploads
+
 import { 
-    activeCheck,          // Controller function to check if server is active
-    createPost,           // Controller function to create a new post
-    getAllPosts,          // Controller function to fetch all posts
-    deletePost,           // Controller function to delete a specific post
-    commentPost,          // Controller function to add a comment to a post
-    get_comments_by_post, // Controller function to get comments of a post
-    delete_comment_of_user,       // Controller function to delete a specific comment
-    increment_likes,       // Controller function to increment likes on a post
+    activeCheck,
+    createPost,
+    getAllPosts,
+    deletePost,
+    commentPost,
+    get_comments_by_post,
+    delete_comment_of_user,
+    increment_likes,
 } from "../controllers/posts.controller.js";
 
-import multer from "multer"
-const storage = multer.diskStorage({
-    destination: function (req, file, cb) {
-        cb(null, "./public/temp") // Set the upload directory
-    },
-    filename: function (req, file, cb) {
-        // const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9)
-        cb(null, file.originalname) // Set the file name
-    }
-})
-const upload = multer({ storage: storage })
+// ============================================================
+// MULTER CONFIGURATION – MEMORY STORAGE
+// ============================================================
+const storage = multer.memoryStorage(); // Store files in memory as Buffer
+const upload = multer({ storage: storage });
 
-// Create an Express router instance
+// ============================================================
+// CREATE ROUTER
+// ============================================================
 const router = Router();
-
-
-
-
 
 // ============================================================
 // ROUTES
 // ============================================================
 
-// Test route to check if the server is active
+// Server health check
 router.route('/').get(activeCheck);
 
-// Route for creating a post (supports file upload via multer)
-router.post("/post",upload.single("media"),createPost);
+// Create post (with file upload handled in memory)
+router.post("/post", upload.single("media"), createPost);
 
-// Route for fetching all posts
+// Fetch all posts
 router.get("/posts", getAllPosts);
 
-// Route for deleting a specific post
+// Delete a post
 router.delete("/delete_post", deletePost);
 
-// Route for adding a comment to a post
+// Add a comment
 router.post("/comment", commentPost);
 
-// Route for fetching comments of a specific post
+// Get comments by post
 router.get("/get_comments", get_comments_by_post);
 
-// Route for deleting a specific comment
+// Delete a comment
 router.route("/delete_comment").delete(delete_comment_of_user);
 
-// Route for incrementing likes on a post
+// Increment likes on a post
 router.route("/increment_post_like").post(increment_likes);
-
 
 // ============================================================
 // EXPORT ROUTER
 // ============================================================
-// Exporting router so it can be used in the main server file
 export default router;
