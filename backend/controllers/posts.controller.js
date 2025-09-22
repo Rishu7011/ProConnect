@@ -156,6 +156,7 @@ export const commentPost = async (req, res) => {
   const { token, post_id, commentBody } = req.body;
 
   try {
+    console.log("Creating post comment for post:", post_id)
     // Validate user by token
     const user = await User.findOne({ token: token }).select("_id");
     if (!user) {
@@ -192,6 +193,7 @@ export const get_comments_by_post = async (req, res) => {
 
   try {
     const post = await Post.findOne({ _id: post_id });
+    
 
 
     if (!post) {
@@ -201,10 +203,15 @@ export const get_comments_by_post = async (req, res) => {
       .find({ postId: post_id })
       .populate(
         "userId",
-        "username name"
+        "username name profilePicture"
       );
     console.log("Comments found:", comments.length)
-    return res.status(202).json(comments.reverse());
+    
+    return res.status(202).json({
+      post_id:post_id,
+      comments: comments.reverse(),
+      profilePicture: comments.userId?.profilePicture || ""
+    });
   } catch (error) {
     return res.status(500).json({ message: error.message });
   }
@@ -216,30 +223,31 @@ export const get_comments_by_post = async (req, res) => {
 export const delete_comment_of_user = async (req, res) => {
   const { token, comment_id } = req.body;
   try {
-    // Validate user (⚠ currently querying Post with token, probably should query User)
-    const token = await Post.findOne({ token: token }).select("_id");
-    if (!token) {
+    // Validate user
+    const user = await User.findOne({ token }).select("_id");
+    if (!user) {
       return res.status(401).json({ message: "User not found" });
     }
 
-    // Find comment by ID
-    const comment = await Comment.findOne({ _id: comment_id });
+    // Find comment
+    const comment = await Comment.findById(comment_id);
     if (!comment) {
-      return res.status(500).json({ message: "comment not found" });
+      return res.status(404).json({ message: "Comment not found" });
     }
 
-    // Ensure the comment belongs to the user
+    // Check ownership
     if (comment.userId.toString() !== user._id.toString()) {
-      return res.status(401).json({ message: "UUnauthorized" });
+      return res.status(401).json({ message: "Unauthorized" });
     }
 
-    // Delete comment
+    // Delete
     await Comment.deleteOne({ _id: comment_id });
-    return res.json({ message: "Comment Deleted" });
+    return res.json({ success: true, message: "Comment Deleted" });
   } catch (error) {
     return res.status(500).json({ message: error.message });
   }
 };
+
 
 // ============================================================
 // INCREMENT POST LIKES

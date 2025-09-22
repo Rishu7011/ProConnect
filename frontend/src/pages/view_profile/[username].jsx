@@ -198,7 +198,7 @@ function ViewProfilePage({ userProfile }) {
                           <div className={styles.card_profileContainer}>
                             {post.media !== "" ? (
                               <img
-                                src={`${Base_URL}/${post.media}`}
+                                src={post.media}
                                 alt="recent added"
                               />
                             ) : (

@@ -31,29 +31,29 @@ function Dashboard() {
   const [commentText, setCommentText] = useState("");
   const [Loading, setLoading] = useState(false);
   const Loader = () => {
-  return (
-    <svg width="50" height="50" viewBox="0 0 50 50" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <circle 
-        cx="25" 
-        cy="25" 
-        r="20" 
-        stroke="white" 
-        strokeWidth="4" 
-        strokeLinecap="round" 
-        strokeDasharray="31.4 31.4"
-      >
-        <animateTransform 
-          attributeName="transform"
-          type="rotate"
-          from="0 25 25"
-          to="360 25 25"
-          dur="1s"
-          repeatCount="indefinite"
-        />
-      </circle>
-    </svg>
-  );
-};
+    return (
+      <svg width="50" height="50" viewBox="0 0 50 50" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle
+          cx="25"
+          cy="25"
+          r="20"
+          stroke="white"
+          strokeWidth="4"
+          strokeLinecap="round"
+          strokeDasharray="31.4 31.4"
+        >
+          <animateTransform
+            attributeName="transform"
+            type="rotate"
+            from="0 25 25"
+            to="360 25 25"
+            dur="1s"
+            repeatCount="indefinite"
+          />
+        </circle>
+      </svg>
+    );
+  };
 
 
   useEffect(() => {
@@ -91,23 +91,22 @@ function Dashboard() {
   const [fileContent, setFileContent] = useState(null);
 
   const handleUpload = async () => {
-  setLoading(true);  // ✅ Set Loading to true when starting the upload
-  try {
-    await dispatch(createPost({
-      token: localStorage.getItem("token"),
-      file: fileContent,
-      body: postContent
-    }));
-    console.log("Post sent successfully from dashboard");
-    setPostContent("");
-    setFileContent(null);
-    await dispatch(getAllPosts());  // ✅ Optionally wait before finishing
-  } catch (error) {
-    console.error("Error posting:", error);
-  } finally {
-    setLoading(false);  // ✅ Set Loading to false after finishing
-  }
-};
+    setLoading(true);  // ✅ Set Loading to true when starting the upload
+    try {
+      await dispatch(createPost({
+        token: localStorage.getItem("token"),
+        file: fileContent,
+        body: postContent
+      }));
+      setPostContent("");
+      setFileContent(null);
+      await dispatch(getAllPosts());  // ✅ Optionally wait before finishing
+    } catch (error) {
+      console.error("Error posting:", error);
+    } finally {
+      setLoading(false);  // ✅ Set Loading to false after finishing
+    }
+  };
 
   // useState(()=>{
   //   setInterval(()=>{
@@ -122,7 +121,7 @@ function Dashboard() {
           <div className={styles.scrollComponent}>
             {/* Create Post */}
             <div className={styles.createPostContainer}>
-              <img style={{cursor:"pointer"}} onClick={()=>{router.push(`/view_profile/${authState.user.userId.username}`)}}
+              <img style={{ cursor: "pointer" }} onClick={() => { router.push(`/view_profile/${authState.user.userId.username}`) }}
                 className={styles.profilePic}
                 src={authState.user.userId.profilePicture}
                 alt="profile"
@@ -156,7 +155,7 @@ function Dashboard() {
               />
               {postContent.length > 0 && (
                 <button onClick={handleUpload} className={styles.uploadButton}>
-                  {Loading? <Loader /> : "Post"}
+                  {Loading ? <Loader /> : "Post"}
                 </button>
               )}
             </div>
@@ -166,14 +165,14 @@ function Dashboard() {
               {postState.posts.map((post) => (
                 <div key={post._id} className={styles.postCard}>
                   <div className={styles.postHeader}>
-                    <img style={{cursor:"pointer"}} onClick={()=>{router.push(`/view_profile/${post.userId.username}`)}}
+                    <img style={{ cursor: "pointer" }} onClick={() => { router.push(`/view_profile/${post.userId.username}`) }}
                       className={styles.profilePic}
                       src={post.userId.profilePicture}
                       alt="user"
                     />
                     <div className={styles.postUserInfo}>
                       <div className={styles.userTop}>
-                        <p style={{cursor:"pointer"}} onClick={()=>{router.push(`/view_profile/${post.userId.username}`)}} className={styles.userName}>{post.userId.name}</p>
+                        <p style={{ cursor: "pointer" }} onClick={() => { router.push(`/view_profile/${post.userId.username}`) }} className={styles.userName}>{post.userId.name}</p>
                         {post.userId._id === authState.user.userId._id && (
                           <button
                             onClick={async () => {
@@ -213,7 +212,7 @@ function Dashboard() {
                           </button>
                         )}
                       </div>
-                      <p style={{cursor:"pointer"}} onClick={()=>{router.push(`/view_profile/${post.userId.username}`)}} className={styles.userHandle}>
+                      <p style={{ cursor: "pointer" }} onClick={() => { router.push(`/view_profile/${post.userId.username}`) }} className={styles.userHandle}>
                         @{post.userId.username}
                       </p>
                     </div>
@@ -320,19 +319,21 @@ function Dashboard() {
                 >
                   {postState.comments.length === 0 && <h2>No Comments</h2>}
                   {postState.comments.length > 0 && <h2>Comments</h2>}
-                  {postState.comments.length > 0 && postState.comments.map((comment) => (
-                    <div key={comment._id} className={styles.singleComment}>
-                      <img src={`${Base_URL}/${comment.userId.profilePicture}`} alt="" />
-                      <div>
-                        <p style={{ fontWeight: "bold" }}>{comment.userId.name}</p>
-                        <p>{comment.body}</p>
+                  <div className={styles.commentsList}>
+                    {postState.comments.length > 0 && postState.comments.map((comment) => (
+                      <div key={comment._id} className={styles.singleComment}>
+                        <img src={comment.userId.profilePicture} alt="" />
+                        <div>
+                          <p style={{ fontWeight: "bold" }}>@{comment.userId.username}</p>
+                          <p className={styles.commentText}>{comment.body}</p>
+                        </div>
                       </div>
-                    </div>
-                  ))}
+                    ))}
+                  </div>
                   <div className={styles.postCommentContainer}>
                     <input type="text" value={commentText} onChange={(e) => setCommentText(e.target.value)} placeholder="comment" />
-                    <div onClick={async ()=>{
-                      await dispatch(postComment({post_id:postState.postId,body:commentText}))
+                    <div onClick={async () => {
+                      await dispatch(postComment({ post_id: postState.postId, body: commentText }))
                       await dispatch(getAllComments({ post_id: postState.postId }));
                       setCommentText("");
                     }} className={styles.postCommentContainer_button}>

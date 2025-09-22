@@ -8,7 +8,7 @@ const initialState = {
   isloading: false,
   loggedIn: false,
   message: "",
-  comments: {},   // store comments per post (postId -> array of comments)
+  comments: [],   // store comments per post (postId -> array of comments)
   postId: "",
 };
 
@@ -46,6 +46,7 @@ const postSlice = createSlice({
         // state.comments[post_id] = comments; // save comments per post
         state.postId = action.payload.post_id;
         state.comments = action.payload.comments;
+        state.profilePicture = action.payload.profilePicture || "";
         // state.isError = false;
       });
       },

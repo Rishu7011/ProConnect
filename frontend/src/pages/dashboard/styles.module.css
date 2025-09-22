@@ -314,6 +314,7 @@
   padding: 1.4rem;
   position: relative;
   top: 10px;
+  display: grid;
 }
 
 .postCommentContainer{
@@ -352,4 +353,32 @@
 }
 .postCommentContainer div:hover{
   background-color: #1d4ed8;
+}
+.singleComment{
+  margin-top: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 1.2rem;
+  
+}
+
+.singleComment img{
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #4f46e5;
+}
+.commentsList{
+  margin-top: 0.5rem;
+  height: 70vh;
+  
+  overflow-y: auto;
+  padding-right: 10px;
+  scrollbar-width: none; 
+  -ms-overflow-style: none;
+}
+.commentText{
+  margin-left: 1rem;
 }
